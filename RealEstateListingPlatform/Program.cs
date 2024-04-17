@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using RealEstateListingPlatform.Data;
+
 namespace RealEstateListingPlatform
 {
     public class Program
@@ -12,6 +15,15 @@ namespace RealEstateListingPlatform
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+
+            //DbContext
+            builder.Services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+
 
             var app = builder.Build();
 
