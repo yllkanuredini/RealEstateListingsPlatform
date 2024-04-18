@@ -19,5 +19,8 @@ namespace RealEstateListingPlatform.Models
         public int Bathrooms { get; set; }
         public int SquareMeters { get; set; }
         public DateTime CreatedDate { get; set; }
+
+        public List<PropertyImage> PropertyImages { get; set; }
+        public List<PropertyAmenity> PropertyAmenities { get; set; }
     }
 }
