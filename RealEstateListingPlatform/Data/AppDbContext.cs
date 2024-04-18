@@ -10,6 +10,6 @@ namespace RealEstateListingPlatform.Data
             
         }
 
-        public DbSet<Test> Tests { get; set; }
+        public DbSet<Property> Properties { get; set; }
     }
 }
