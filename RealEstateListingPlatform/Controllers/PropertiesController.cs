@@ -31,12 +31,17 @@ namespace RealEstateListingPlatform.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Property>> GetProperty(int id)
         {
-            var property = await _context.Properties.FindAsync(id);
+            var property = await _context.Properties
+                .Include(p => p.PropertyAmenities)
+                .ThenInclude(pa => pa.Amenity)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (property == null)
             {
                 return NotFound();
             }
+
+            property.PropertyAmenities = property.PropertyAmenities?.Where(pa => pa.Amenity != null).ToList();
 
             return property;
         }
