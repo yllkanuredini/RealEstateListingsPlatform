@@ -49,6 +49,7 @@ namespace RealEstateListingPlatform.Controllers
             return CreatedAtAction(nameof(GetAmenity), new { id = amenity.Id }, amenity);
         }
 
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAmenity(int id, Amenity amenity)
         {
