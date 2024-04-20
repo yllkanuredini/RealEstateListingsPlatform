@@ -144,6 +144,30 @@ namespace RealEstateListingPlatform.Controllers
             return NoContent();
         }
 
+        [HttpDelete("RemoveAmenityFromProperty")]
+        public async Task<IActionResult> RemoveAmenityFromProperty(int propertyId, int amenityId)
+        {
+            var property = await _context.Properties.Include(p => p.PropertyAmenities)
+                                                    .FirstOrDefaultAsync(p => p.Id == propertyId);
+
+            if (property == null)
+            {
+                return NotFound("Property not found.");
+            }
+
+            var propertyAmenity = property.PropertyAmenities.FirstOrDefault(pa => pa.AmenityId == amenityId);
+
+            if (propertyAmenity == null)
+            {
+                return NotFound("Amenity not found for this property.");
+            }
+
+            _context.PropertyAmenities.Remove(propertyAmenity);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         private bool PropertyExists(int id)
         {
             return _context.Properties.Any(e => e.Id == id);
