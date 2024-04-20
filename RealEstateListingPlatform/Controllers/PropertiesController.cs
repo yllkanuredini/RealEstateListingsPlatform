@@ -25,13 +25,14 @@ namespace RealEstateListingPlatform.Controllers
                 return NotFound();
             }
 
-            return await _context.Properties.Include(p => p.PropertyAmenities).ToListAsync();
+            return await _context.Properties.Include(p => p.PropertyAmenities).Include(p => p.PropertyImages).ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Property>> GetProperty(int id)
         {
             var property = await _context.Properties
+                .Include(p => p.PropertyImages)
                 .Include(p => p.PropertyAmenities)
                 .ThenInclude(pa => pa.Amenity)
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -82,7 +83,7 @@ namespace RealEstateListingPlatform.Controllers
             }
 
             var amenity = await _context.Amenities.FindAsync(amenityId);
-            if(amenity == null)
+            if (amenity == null)
             {
                 return NotFound("Amenity not found.");
             }
