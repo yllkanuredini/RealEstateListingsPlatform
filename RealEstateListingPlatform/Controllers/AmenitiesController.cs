@@ -24,13 +24,16 @@ namespace RealEstateListingPlatform.Controllers
             {
                 return NotFound();
             }
-            return await _context.Amenities.ToListAsync();
+            return await _context.Amenities.Include(p => p.PropertyAmenities).ThenInclude(pa => pa.Property).ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Amenity>> GetAmenity(int id)
         {
-            var amenity = await _context.Amenities.FindAsync(id);
+            var amenity = await _context.Amenities
+                .Include(p => p.PropertyAmenities)
+                .ThenInclude(pa => pa.Property)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (amenity == null)
             {
@@ -43,11 +46,14 @@ namespace RealEstateListingPlatform.Controllers
         [HttpPost]
         public async Task<ActionResult<Amenity>> CreateAmenity(Amenity amenity)
         {
+            //amenity.PropertyAmenities = new List<PropertyAmenity>();
             _context.Amenities.Add(amenity);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetAmenity), new { id = amenity.Id }, amenity);
         }
+
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAmenity(int id, Amenity amenity)
