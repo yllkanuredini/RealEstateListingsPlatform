@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RealEstateListingPlatform.Data;
+using RealEstateListingPlatform.Models;
 using System.Text.Json.Serialization;
 
 namespace RealEstateListingPlatform
@@ -28,6 +31,24 @@ namespace RealEstateListingPlatform
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            // Identity
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
+
+            //Authentication
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+            });
+
 
 
             var app = builder.Build();
@@ -41,12 +62,53 @@ namespace RealEstateListingPlatform
 
             app.UseHttpsRedirection();
 
+
+            // Authentication & Authorization
+            app.UseAuthentication();
             app.UseAuthorization();
+
+
+
+
+            /*using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                SeedData(userManager, roleManager).Wait();
+            }
+            */
 
 
             app.MapControllers();
 
             app.Run();
+
+
+            // Method for seeding initial data into the application's database (used for creating an admin user)
+            async Task SeedData(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+            {
+ 
+                if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+                }
+
+                if (await userManager.FindByEmailAsync("admin@RealEstate.com") == null)
+                {
+                    var adminUser = new IdentityUser
+                    {
+                        UserName = "admin",
+                        Email = "admin@RealEstate.com"
+                    };
+                    var result = await userManager.CreateAsync(adminUser, "Admin123!");
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(adminUser, UserRoles.Admin);
+                    }
+                }
+            }
+
         }
     }
 }
