@@ -72,20 +72,16 @@ namespace RealEstateListingPlatform.Controllers
         [Route("register")]
         public async Task<IActionResult> Register(User userRegistration)
         {
-            // Check if a user with the same email already exists
             var userExists = await _userManager.FindByEmailAsync(userRegistration.Email);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
 
-            // Create a new IdentityUser object and populate its properties
             var newUser = new IdentityUser
             {
-                UserName = userRegistration.Email, // You can set username to email or any other unique identifier
+                UserName = userRegistration.Email, 
                 Email = userRegistration.Email,
-                // You can set other properties like FirstName and LastName here if needed
             };
 
-            // Create the user in the database
             var result = await _userManager.CreateAsync(newUser, userRegistration.Password);
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User creation failed! Please check user details and try again." });
