@@ -38,6 +38,8 @@ namespace RealEstateListingPlatform.Data
 
         public DbSet<Inquiry> Inquiries { get; set; }
         public DbSet<Viewing> Viewings { get; set; }
+        public DbSet<Listing> Listings { get; set; }
+        public DbSet<FavoriteListing> FavoriteListings { get; set; }
 
     }
 }
