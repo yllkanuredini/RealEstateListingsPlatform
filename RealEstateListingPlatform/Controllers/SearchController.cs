@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using RealEstateListingPlatform.Data;
 using RealEstateListingPlatform.Models;
 
-
 namespace RealEstateListingPlatform.Controllers
 {
     [ApiController]
@@ -22,18 +21,46 @@ namespace RealEstateListingPlatform.Controllers
             _context = context;
         }
 
-        // GET: api/Search?query=zipcode or city or address
+        // GET: api/Search
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Property>>> SearchProperties(string query)
+        public async Task<ActionResult<IEnumerable<Property>>> SearchProperties(
+            string type,
+            decimal? minPrice,
+            decimal? maxPrice,
+            string location,
+            string amenities)
         {
-            if (string.IsNullOrEmpty(query))
+            var query = _context.Properties.AsQueryable();
+
+            if (!string.IsNullOrEmpty(type))
             {
-                return BadRequest("Search query is required.");
+                query = query.Where(p => p.Type == type);
             }
 
-            var properties = await _context.Properties
-                .Where(p => p.Address.Contains(query) || p.City.Contains(query) || p.ZipCode.Contains(query))
-                .ToListAsync();
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            if (!string.IsNullOrEmpty(location))
+            {
+                query = query.Where(p => p.Address.Contains(location) ||
+                                         p.City.Contains(location) ||
+                                         p.ZipCode.Contains(location));
+            }
+
+            if (!string.IsNullOrEmpty(amenities))
+            {
+                var amenitiesList = amenities.Split(',').Select(a => a.Trim()).ToList();
+                query = query.Where(p => p.PropertyAmenities.Any(a => amenitiesList.Contains(a.Amenity.Name)));
+            }
+
+            var properties = await query.ToListAsync();
 
             if (!properties.Any())
             {
