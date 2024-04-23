@@ -32,5 +32,8 @@ namespace RealEstateListingPlatform.Data
         public DbSet<Amenity> Amenities { get; set; }
         public DbSet<PropertyAmenity> PropertyAmenities { get; set; }
 
+        public DbSet<Inquiry> Inquiries { get; set; }
+        public DbSet<Viewing> Viewings { get; set; }
+
     }
 }

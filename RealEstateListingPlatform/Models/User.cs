@@ -4,6 +4,8 @@ namespace RealEstateListingPlatform.Models
 {
     public class User
     {
+        [Key]
+        public int Id { get; set; }
         [Required(ErrorMessage = "First Name is required")]
         public string? FirstName { get; set; }
 
