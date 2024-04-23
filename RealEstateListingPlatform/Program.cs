@@ -76,8 +76,8 @@ namespace RealEstateListingPlatform
                 var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 SeedData(userManager, roleManager).Wait();
-            }
-            */
+            }*/
+            
 
 
             app.MapControllers();
