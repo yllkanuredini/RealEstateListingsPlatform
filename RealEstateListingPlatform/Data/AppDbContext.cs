@@ -23,9 +23,9 @@ namespace RealEstateListingPlatform.Data
             modelBuilder.Entity<PropertyAmenity>().HasOne(p => p.Property).WithMany(pa => pa.PropertyAmenities).HasForeignKey(p => p.PropertyId);
             modelBuilder.Entity<PropertyAmenity>().HasOne(a => a.Amenity).WithMany(pa => pa.PropertyAmenities).HasForeignKey(a => a.AmenityId);
 
-            // Ignore ConfirmPassword property
+            /*// Ignore ConfirmPassword property
             modelBuilder.Entity<User>()
-                .Ignore(u => u.ConfirmPassword);
+                .Ignore(u => u.ConfirmPassword);*/
 
 
             base.OnModelCreating(modelBuilder);

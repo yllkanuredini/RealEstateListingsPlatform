@@ -70,7 +70,7 @@ namespace RealEstateListingPlatform.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register(User userRegistration)
+        public async Task<IActionResult> Register(UserRegistration userRegistration)
         {
             var userExists = await _userManager.FindByEmailAsync(userRegistration.Email);
             if (userExists != null)
@@ -83,7 +83,7 @@ namespace RealEstateListingPlatform.Controllers
                 PhoneNumber = userRegistration.PhoneNumber,
             };
 
-            var result = await _userManager.CreateAsync(newUser, userRegistration.PasswordHash);
+            var result = await _userManager.CreateAsync(newUser, userRegistration.Password);
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
