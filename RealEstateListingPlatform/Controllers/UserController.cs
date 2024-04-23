@@ -78,8 +78,9 @@ namespace RealEstateListingPlatform.Controllers
 
             var newUser = new IdentityUser
             {
-                UserName = userRegistration.Email, 
+                UserName = userRegistration.Username, 
                 Email = userRegistration.Email,
+                PhoneNumber = userRegistration.PhoneNumber,
             };
 
             var result = await _userManager.CreateAsync(newUser, userRegistration.Password);
