@@ -14,10 +14,10 @@ namespace RealEstateListingPlatform.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private IConfiguration _configuration;
 
-        public UserController(UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public UserController(UserManager<User> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
@@ -76,20 +76,21 @@ namespace RealEstateListingPlatform.Controllers
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User already exists!" });
 
-            var newUser = new IdentityUser
+            var newUser = new User
             {
-                UserName = userRegistration.Username, 
+                UserName = userRegistration.UserName,
                 Email = userRegistration.Email,
                 PhoneNumber = userRegistration.PhoneNumber,
             };
 
-            var result = await _userManager.CreateAsync(newUser, userRegistration.Password);
+            var result = await _userManager.CreateAsync(newUser, userRegistration.PasswordHash);
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
             return Ok(new { Status = "Success", Message = "User created successfully!" });
         }
 
-
     }
 }
+
+

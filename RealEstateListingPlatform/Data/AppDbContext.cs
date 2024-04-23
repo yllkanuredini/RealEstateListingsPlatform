@@ -5,7 +5,7 @@ using RealEstateListingPlatform.Models;
 
 namespace RealEstateListingPlatform.Data
 {
-    public class AppDbContext : IdentityDbContext<IdentityUser>
+    public class AppDbContext : IdentityDbContext<User>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
         { 
@@ -22,6 +22,10 @@ namespace RealEstateListingPlatform.Data
 
             modelBuilder.Entity<PropertyAmenity>().HasOne(p => p.Property).WithMany(pa => pa.PropertyAmenities).HasForeignKey(p => p.PropertyId);
             modelBuilder.Entity<PropertyAmenity>().HasOne(a => a.Amenity).WithMany(pa => pa.PropertyAmenities).HasForeignKey(a => a.AmenityId);
+
+            // Ignore ConfirmPassword property
+            modelBuilder.Entity<User>()
+                .Ignore(u => u.ConfirmPassword);
 
 
             base.OnModelCreating(modelBuilder);

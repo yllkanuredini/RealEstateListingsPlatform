@@ -25,6 +25,12 @@ namespace RealEstateListingPlatform
             builder.Services.AddSwaggerGen();
 
 
+            /*builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            });*/
+
+
             //DbContext
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
@@ -32,7 +38,7 @@ namespace RealEstateListingPlatform
             });
 
             // Identity
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+            builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -77,7 +83,7 @@ namespace RealEstateListingPlatform
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 SeedData(userManager, roleManager).Wait();
             }*/
-            
+
 
 
             app.MapControllers();
@@ -86,9 +92,9 @@ namespace RealEstateListingPlatform
 
 
             // Method for seeding initial data into the application's database (used for creating an admin user)
-            async Task SeedData(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+            async Task SeedData(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
             {
- 
+
                 if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
                 {
                     await roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
@@ -96,7 +102,7 @@ namespace RealEstateListingPlatform
 
                 if (await userManager.FindByEmailAsync("admin@RealEstate.com") == null)
                 {
-                    var adminUser = new IdentityUser
+                    var adminUser = new User
                     {
                         UserName = "admin",
                         Email = "admin@RealEstate.com"
@@ -108,7 +114,6 @@ namespace RealEstateListingPlatform
                     }
                 }
             }
-
         }
     }
 }
