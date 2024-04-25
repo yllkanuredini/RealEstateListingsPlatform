@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RealEstateListingPlatform.Data;
@@ -57,15 +58,13 @@ namespace RealEstateListingPlatform
             });
 
 
-            /*builder.Services.AddControllers()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.IgnoreNullValues = true; // Ignore null values
-                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; // Use camelCase for property names
-                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // Convert enums to strings
-                    //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull; // Ignore null values when writing JSON
-                });*/
-
+            builder.Services.AddControllers(options =>
+            {
+ 
+            }).AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = null;
+            });
 
             //DbContext
             builder.Services.AddDbContext<AppDbContext>(options =>
