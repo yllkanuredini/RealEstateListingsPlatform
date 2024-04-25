@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RealEstateListingPlatform.Data;
 using RealEstateListingPlatform.Models;
+using System.Data;
 
 namespace RealEstateListingPlatform.Controllers
 {
@@ -64,6 +66,8 @@ namespace RealEstateListingPlatform.Controllers
                 .ToListAsync();
         }
 
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Property>> CreateProperty(Property property)
         {
@@ -73,6 +77,8 @@ namespace RealEstateListingPlatform.Controllers
             return CreatedAtAction(nameof(GetProperty), new { id = property.Id }, property);
         }
 
+
+        [Authorize(Roles = "Admin")]
         [HttpPost("AddAmenityToProperty")]
         public async Task<ActionResult<PropertyAmenity>> AddAmenityToProperty(int propertyId, int amenityId)
         {
@@ -99,7 +105,7 @@ namespace RealEstateListingPlatform.Controllers
             return NoContent();
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProperty(int id, Property property)
         {
@@ -129,6 +135,7 @@ namespace RealEstateListingPlatform.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProperty(int id)
         {
@@ -144,6 +151,7 @@ namespace RealEstateListingPlatform.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("RemoveAmenityFromProperty")]
         public async Task<IActionResult> RemoveAmenityFromProperty(int propertyId, int amenityId)
         {

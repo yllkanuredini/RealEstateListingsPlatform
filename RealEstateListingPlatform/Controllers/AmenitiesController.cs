@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RealEstateListingPlatform.Data;
 using RealEstateListingPlatform.Models;
+using System.Data;
 
 namespace RealEstateListingPlatform.Controllers
 {
@@ -42,7 +45,7 @@ namespace RealEstateListingPlatform.Controllers
 
             return amenity;
         }
-
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpPost]
         public async Task<ActionResult<Amenity>> CreateAmenity(Amenity amenity)
         {
@@ -54,7 +57,7 @@ namespace RealEstateListingPlatform.Controllers
         }
 
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAmenity(int id, Amenity amenity)
         {
@@ -83,6 +86,7 @@ namespace RealEstateListingPlatform.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAmenity(int id)
         {
