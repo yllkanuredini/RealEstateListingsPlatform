@@ -57,15 +57,14 @@ namespace RealEstateListingPlatform
             });
 
 
-            builder.Services.AddControllers(options =>
-            {
-                // Configure additional options if needed
-            })
+            /*builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.ReferenceHandler = null;
-                });
-
+                    options.JsonSerializerOptions.IgnoreNullValues = true; // Ignore null values
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; // Use camelCase for property names
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // Convert enums to strings
+                    //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull; // Ignore null values when writing JSON
+                });*/
 
 
             //DbContext
