@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using RealEstateListingPlatform.Data;
 using RealEstateListingPlatform.Models;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace RealEstateListingPlatform
@@ -22,6 +23,7 @@ namespace RealEstateListingPlatform
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
             });
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -55,10 +57,14 @@ namespace RealEstateListingPlatform
             });
 
 
-            /*builder.Services.AddControllers().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            });*/
+            /*builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.IgnoreNullValues = true; // Ignore null values
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; // Use camelCase for property names
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // Convert enums to strings
+                    //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull; // Ignore null values when writing JSON
+                });*/
 
 
             //DbContext
@@ -97,7 +103,12 @@ namespace RealEstateListingPlatform
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            app.UseCors(builder => builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            );
+
+                // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
