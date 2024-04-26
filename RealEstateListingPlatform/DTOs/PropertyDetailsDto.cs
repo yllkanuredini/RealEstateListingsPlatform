@@ -1,6 +1,6 @@
 ﻿namespace RealEstateListingPlatform.DTOs
 {
-    public class PropertyDto
+    public class PropertyDetailsDto
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -16,7 +16,5 @@
         public int Bathrooms { get; set; }
         public int SquareMeters { get; set; }
         public DateTime CreatedDate { get; set; }
-        public List<PropertyImageDto> PropertyImages { get; set; }
-        public List<PropertyAmenityDto> PropertyAmenities { get; set; }
     }
 }

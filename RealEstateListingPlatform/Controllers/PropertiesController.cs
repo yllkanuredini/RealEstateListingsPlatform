@@ -22,14 +22,14 @@ namespace RealEstateListingPlatform.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PropertyDto>>> GetProperties()
+        public async Task<ActionResult<IEnumerable<PropertyDetailsDto>>> GetProperties()
         {
             if (_context.Properties == null)
             {
                 return NotFound();
             }
             var properties = await _context.Properties
-                .Select(p => new PropertyDto
+                .Select(p => new PropertyDetailsDto
                 {
                     Id = p.Id,
                     Title = p.Title,
@@ -44,19 +44,7 @@ namespace RealEstateListingPlatform.Controllers
                     Bedrooms = p.Bedrooms,
                     Bathrooms = p.Bathrooms,
                     SquareMeters = p.SquareMeters,
-                    CreatedDate = p.CreatedDate,
-                    PropertyImages = p.PropertyImages.Select(pi => new PropertyImageDto
-                    {
-                        Id = pi.Id,
-                        Url = pi.Url,
-                        IsMain = pi.IsMain
-                    }).ToList(),
-                    PropertyAmenities = p.PropertyAmenities.Select(pa => new PropertyAmenityDto
-                    {
-                        PropertyId = pa.PropertyId,
-                        AmenityId = pa.AmenityId,
-                        AmenityName = pa.Amenity.Name
-                    }).ToList()
+                    CreatedDate= p.CreatedDate,
                 })
                 .ToListAsync();
 
@@ -64,7 +52,7 @@ namespace RealEstateListingPlatform.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PropertyDto>> GetProperty(int id)
+        public async Task<ActionResult<PropertyDetailsDto>> GetProperty(int id)
         {
             var property = await _context.Properties
                 .Include(p => p.PropertyImages)
@@ -78,7 +66,7 @@ namespace RealEstateListingPlatform.Controllers
             }
 
             property.PropertyAmenities = property.PropertyAmenities?.Where(pa => pa.Amenity != null).ToList();
-            var propertyDto = new PropertyDto
+            var propertyDto = new PropertyDetailsDto
             {
                 Id = property.Id,
                 Title = property.Title,
@@ -93,19 +81,7 @@ namespace RealEstateListingPlatform.Controllers
                 Bedrooms = property.Bedrooms,
                 Bathrooms = property.Bathrooms,
                 SquareMeters = property.SquareMeters,
-                CreatedDate = property.CreatedDate,
-                PropertyImages = property.PropertyImages.Select(pi => new PropertyImageDto
-                {
-                    Id = pi.Id,
-                    Url = pi.Url,
-                    IsMain = pi.IsMain
-                }).ToList(),
-                PropertyAmenities = property.PropertyAmenities.Select(pa => new PropertyAmenityDto
-                {
-                    PropertyId = pa.PropertyId,
-                    AmenityId = pa.AmenityId,
-                    AmenityName = pa.Amenity.Name
-                }).ToList()
+                CreatedDate = DateTime.Now,
             };
 
             return propertyDto;
@@ -130,7 +106,7 @@ namespace RealEstateListingPlatform.Controllers
 
         //[Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<PropertyDto>> CreateProperty(PropertyDto propertyDto)
+        public async Task<ActionResult<PropertyDetailsDto>> CreateProperty(PropertyDetailsDto propertyDto)
         {
             var property = new Property
             {
@@ -153,7 +129,7 @@ namespace RealEstateListingPlatform.Controllers
             await _context.SaveChangesAsync();
 
 
-            var createdPropertyDto = new PropertyDto
+            var createdPropertyDto = new PropertyDetailsDto
             {
                 Id = property.Id,
                 Title = property.Title,
@@ -177,7 +153,7 @@ namespace RealEstateListingPlatform.Controllers
 
         //[Authorize(Roles = "Admin")]
         [HttpPost("AddAmenityToProperty")]
-        public async Task<ActionResult<PropertyDto>> AddAmenityToProperty(int propertyId, int amenityId)
+        public async Task<ActionResult<PropertyDetailsDto>> AddAmenityToProperty(int propertyId, int amenityId)
         {
             var property = await _context.Properties.FindAsync(propertyId);
             if (property == null)
@@ -197,7 +173,7 @@ namespace RealEstateListingPlatform.Controllers
             await _context.SaveChangesAsync();
 
 
-            var updatedPropertyDto = new PropertyDto
+            var updatedPropertyDto = new PropertyDetailsDto
             {
                 Id = property.Id,
                 Title = property.Title,
@@ -220,7 +196,7 @@ namespace RealEstateListingPlatform.Controllers
 
         //[Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProperty(int id, PropertyDto propertyDto)
+        public async Task<IActionResult> UpdateProperty(int id, PropertyDetailsDto propertyDto)
         {
             if (id != propertyDto.Id)
             {
@@ -286,7 +262,7 @@ namespace RealEstateListingPlatform.Controllers
 
         //[Authorize(Roles = "Admin")]
         [HttpDelete("RemoveAmenityFromProperty")]
-        public async Task<ActionResult<PropertyDto>> RemoveAmenityFromProperty(int propertyId, int amenityId)
+        public async Task<ActionResult<PropertyDetailsDto>> RemoveAmenityFromProperty(int propertyId, int amenityId)
         {
             var property = await _context.Properties.Include(p => p.PropertyAmenities)
                                                     .FirstOrDefaultAsync(p => p.Id == propertyId);
@@ -303,7 +279,7 @@ namespace RealEstateListingPlatform.Controllers
             await _context.SaveChangesAsync();
 
     
-            var updatedPropertyDto = new PropertyDto
+            var updatedPropertyDto = new PropertyDetailsDto
             {
                 Id = property.Id,
                 Title = property.Title,
@@ -319,18 +295,6 @@ namespace RealEstateListingPlatform.Controllers
                 Bathrooms = property.Bathrooms,
                 SquareMeters = property.SquareMeters,
                 CreatedDate = property.CreatedDate,
-                PropertyImages = property.PropertyImages.Select(pi => new PropertyImageDto
-                {
-                    Id = pi.Id,
-                    Url = pi.Url,
-                    IsMain = pi.IsMain
-                }).ToList(),
-                PropertyAmenities = property.PropertyAmenities.Select(pa => new PropertyAmenityDto
-                {
-                    PropertyId = pa.PropertyId,
-                    AmenityId = pa.AmenityId,
-                    AmenityName = pa.Amenity.Name
-                }).ToList()
             };
 
             return updatedPropertyDto;

@@ -27,6 +27,16 @@ namespace RealEstateListingPlatform
 
 
             builder.Services.AddControllers();
+
+
+            builder.Services.AddControllers(options =>
+            {
+
+            }).AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = null;
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
@@ -58,10 +68,7 @@ namespace RealEstateListingPlatform
             });
 
 
-            builder.Services.AddControllers(options =>
-            {
-                //options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            });
+           
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 
@@ -106,6 +113,7 @@ namespace RealEstateListingPlatform
                                   });
             });
 
+            
 
             var app = builder.Build();
             app.UseCors(MyAllowSpecificOrigins);
@@ -134,14 +142,14 @@ namespace RealEstateListingPlatform
 
 
 
-            using (var scope = app.Services.CreateScope())
+            /*using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 var userManager = services.GetRequiredService<UserManager<User>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 SeedData(userManager, roleManager).Wait();
             }
-
+            */
 
 
             app.MapControllers();
