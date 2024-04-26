@@ -15,13 +15,16 @@ namespace RealEstateListingPlatform.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private IConfiguration _configuration;
 
-        public UserController(UserManager<User> userManager, IConfiguration configuration)
+        public UserController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _configuration = configuration;
         }
+
 
         [HttpPost]
         [Route("login")]
@@ -33,14 +36,15 @@ namespace RealEstateListingPlatform.Controllers
                 var userRoles = await _userManager.GetRolesAsync(user);
 
                 var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
+        {
+            new Claim("email", user.Email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim("userId", user.Id), // Add userId claim
+        };
 
                 foreach (var userRole in userRoles)
                 {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                    authClaims.Add(new Claim("role", userRole)); // Add role claim
                 }
 
                 var token = GetToken(authClaims);
@@ -51,23 +55,25 @@ namespace RealEstateListingPlatform.Controllers
                     expiration = token.ValidTo
                 });
             }
-            return Unauthorized("User doesnt exist");
+            return Unauthorized("User doesn't exist");
         }
+
 
         private JwtSecurityToken GetToken(List<Claim> authClaims)
         {
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:Issuer"],
-                audience: _configuration["JWT:Audience"],
+                //issuer: _configuration["JWT:Issuer"],
+                //audience: _configuration["JWT:Audience"],
                 expires: DateTime.Now.AddHours(3),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
+            );
 
             return token;
         }
+        
 
 
         [HttpPost]
@@ -88,6 +94,15 @@ namespace RealEstateListingPlatform.Controllers
             var result = await _userManager.CreateAsync(newUser, userRegistration.Password);
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+
+            // Check if "User" role exists, and add it if it doesn't
+            if (!await _roleManager.RoleExistsAsync(UserRoles.User))
+            {
+                await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+            }
+
+            // Assign the "User" role to the new user
+            await _userManager.AddToRoleAsync(newUser, UserRoles.User);
 
             return Ok(new { Status = "Success", Message = "User created successfully!" });
         }
