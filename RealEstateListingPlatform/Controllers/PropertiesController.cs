@@ -169,7 +169,7 @@ namespace RealEstateListingPlatform.Controllers
             return NoContent();
         }
         [HttpGet("GetFiltered")]
-        public async Task<IActionResult> RemoveAmenityFromProperty([FromQuery] string status)
+        public async Task<IActionResult> GetFilteredProducts([FromQuery] string status)
         {
             try
             {
