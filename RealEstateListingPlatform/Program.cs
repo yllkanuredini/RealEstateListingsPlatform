@@ -29,6 +29,7 @@ namespace RealEstateListingPlatform
             {
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             });*/
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 
             //DbContext
@@ -54,10 +55,19 @@ namespace RealEstateListingPlatform
                 options.SaveToken = true;
                 options.RequireHttpsMetadata = false;
             });
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  policy =>
+                                  {
+                                      policy.WithOrigins("*");
+                                      policy.WithHeaders("*");
+                                  });
+            });
 
 
             var app = builder.Build();
+            app.UseCors(MyAllowSpecificOrigins);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -75,13 +85,13 @@ namespace RealEstateListingPlatform
 
 
 
-            /*using (var scope = app.Services.CreateScope())
+            using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+                var userManager = services.GetRequiredService<UserManager<User>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 SeedData(userManager, roleManager).Wait();
-            }*/
+            }
 
 
 
