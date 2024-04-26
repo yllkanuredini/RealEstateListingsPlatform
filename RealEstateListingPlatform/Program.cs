@@ -1,8 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using RealEstateListingPlatform.Data;
 using RealEstateListingPlatform.Models;
+using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace RealEstateListingPlatform
@@ -12,6 +17,7 @@ namespace RealEstateListingPlatform
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            ConfigurationManager configuration = builder.Configuration;
 
             // Add services to the container.
             builder.Services.AddControllers().AddJsonOptions(options =>
@@ -19,16 +25,43 @@ namespace RealEstateListingPlatform
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
             });
 
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-
-            /*builder.Services.AddControllers().AddJsonOptions(options =>
+            builder.Services.AddSwaggerGen(c =>
             {
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            });*/
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Insert Token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[]{}
+                    }
+
+                });
+            });
+
+
+            builder.Services.AddControllers(options =>
+            {
+                //options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            });
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 
@@ -54,6 +87,14 @@ namespace RealEstateListingPlatform
             {
                 options.SaveToken = true;
                 options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = configuration["JWT:Audience"],
+                    ValidIssuer = configuration["JWT:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"]))
+                };
             });
             builder.Services.AddCors(options =>
             {
@@ -69,7 +110,12 @@ namespace RealEstateListingPlatform
             var app = builder.Build();
             app.UseCors(MyAllowSpecificOrigins);
 
-            // Configure the HTTP request pipeline.
+            app.UseCors(builder => builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            );
+
+                // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

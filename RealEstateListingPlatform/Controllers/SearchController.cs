@@ -21,7 +21,7 @@ namespace RealEstateListingPlatform.Controllers
             _context = context;
         }
 
-        // GET: api/Search
+        // General search endpoint
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Property>>> SearchProperties(
             string type,
@@ -69,7 +69,64 @@ namespace RealEstateListingPlatform.Controllers
 
             return Ok(properties);
         }
+
+        // Filter by property type
+        [HttpGet("ByType/{type}")]
+        public async Task<ActionResult<IEnumerable<Property>>> FilterByType(string type)
+        {
+            var properties = await _context.Properties
+                .Where(p => p.Type == type)
+                .ToListAsync();
+
+            if (!properties.Any())
+                return NotFound("No properties found of the specified type.");
+
+            return Ok(properties);
+        }
+
+        // Filter by price range
+        [HttpGet("ByPriceRange")]
+        public async Task<ActionResult<IEnumerable<Property>>> FilterByPriceRange(decimal minPrice, decimal maxPrice)
+        {
+            var properties = await _context.Properties
+                .Where(p => p.Price >= minPrice && p.Price <= maxPrice)
+                .ToListAsync();
+
+            if (!properties.Any())
+                return NotFound("No properties found within the specified price range.");
+
+            return Ok(properties);
+        }
+
+        // Filter by location
+        [HttpGet("ByLocation/{location}")]
+        public async Task<ActionResult<IEnumerable<Property>>> FilterByLocation(string location)
+        {
+            var properties = await _context.Properties
+                .Where(p => p.Address.Contains(location) ||
+                            p.City.Contains(location) ||
+                            p.ZipCode.Contains(location))
+                .ToListAsync();
+
+            if (!properties.Any())
+                return NotFound("No properties found in the specified location.");
+
+            return Ok(properties);
+        }
+
+        // Filter by amenities
+        [HttpGet("ByAmenities")]
+        public async Task<ActionResult<IEnumerable<Property>>> FilterByAmenities([FromQuery] string amenities)
+        {
+            var amenitiesList = amenities.Split(',').Select(a => a.Trim()).ToList();
+            var properties = await _context.Properties
+                .Where(p => p.PropertyAmenities.Any(a => amenitiesList.Contains(a.Amenity.Name)))
+                .ToListAsync();
+
+            if (!properties.Any())
+                return NotFound("No properties found with the specified amenities.");
+
+            return Ok(properties);
+        }
     }
 }
-
-

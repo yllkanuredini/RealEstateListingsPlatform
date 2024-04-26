@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RealEstateListingPlatform.Data;
 using RealEstateListingPlatform.Models;
+using System.Data;
 using System.Linq;
 
 namespace RealEstateListingPlatform.Controllers
@@ -43,6 +45,7 @@ namespace RealEstateListingPlatform.Controllers
             return propertyImage;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<PropertyImage>> AddImageToProperty(int propertyId, string url, bool isMain)
         {
@@ -65,6 +68,7 @@ namespace RealEstateListingPlatform.Controllers
             return CreatedAtAction(nameof(GetPropertyImageById), new { id = propertyImage.Id }, propertyImage);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePropertyImage(int id, PropertyImage propertyImage)
         {
@@ -94,6 +98,7 @@ namespace RealEstateListingPlatform.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePropertyImage(int id)
         {
