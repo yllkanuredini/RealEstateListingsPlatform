@@ -65,8 +65,7 @@ namespace RealEstateListingPlatform
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
 
             // Authentication & Authorization
