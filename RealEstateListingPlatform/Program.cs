@@ -60,11 +60,10 @@ namespace RealEstateListingPlatform
 
             builder.Services.AddControllers(options =>
             {
- 
-            }).AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.ReferenceHandler = null;
+                //options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             });
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 
             //DbContext
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -97,10 +96,19 @@ namespace RealEstateListingPlatform
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"]))
                 };
             });
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  policy =>
+                                  {
+                                      policy.WithOrigins("*");
+                                      policy.WithHeaders("*");
+                                  });
+            });
 
 
             var app = builder.Build();
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseCors(builder => builder.AllowAnyOrigin()
             .AllowAnyMethod()
@@ -113,8 +121,10 @@ namespace RealEstateListingPlatform
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
-            app.UseHttpsRedirection();
+            if (!app.Environment.IsDevelopment())
+            {
+               app.UseHttpsRedirection();
+            }
 
 
             // Authentication & Authorization
@@ -124,13 +134,13 @@ namespace RealEstateListingPlatform
 
 
 
-            /*using (var scope = app.Services.CreateScope())
+            using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+                var userManager = services.GetRequiredService<UserManager<User>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 SeedData(userManager, roleManager).Wait();
-            }*/
+            }
 
 
 

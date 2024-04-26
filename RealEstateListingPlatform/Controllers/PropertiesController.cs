@@ -9,6 +9,7 @@ using System.Data;
 
 namespace RealEstateListingPlatform.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class PropertiesController : ControllerBase
@@ -334,8 +335,28 @@ namespace RealEstateListingPlatform.Controllers
 
             return updatedPropertyDto;
         }
+        [HttpGet("GetFiltered")]
+        public async Task<IActionResult> GetFilteredProducts([FromQuery] string status)
+        {
+            try
+            {
+              
+                var properties = await _context.Properties.Include(p => p.PropertyAmenities).
+             Where(p => status.Equals("ALL") || p.Status == status).ToListAsync();
 
+                if(!properties.Any())
+                {
+                    return NotFound();
+                }
+                return Ok(properties);
 
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+        
+        }
         private bool PropertyExists(int id)
         {
             return _context.Properties.Any(e => e.Id == id);
