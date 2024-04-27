@@ -54,53 +54,61 @@ namespace RealEstateListingPlatform.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PropertyDetailsDto>> GetProperty(int id)
         {
+            if (_context.Properties == null)
+            {
+                return NotFound();
+            }
+
             var property = await _context.Properties
-                .Include(p => p.PropertyImages)
-                .Include(p => p.PropertyAmenities)
-                    .ThenInclude(pa => pa.Amenity)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .Where(p => p.Id == id)
+                .Select(p => new PropertyDetailsDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Description = p.Description,
+                    Type = p.Type,
+                    Status = p.Status,
+                    Price = p.Price,
+                    Address = p.Address,
+                    City = p.City,
+                    Country = p.Country,
+                    ZipCode = p.ZipCode,
+                    Bedrooms = p.Bedrooms,
+                    Bathrooms = p.Bathrooms,
+                    SquareMeters = p.SquareMeters,
+                    CreatedDate = p.CreatedDate
+                })
+                .FirstOrDefaultAsync();
 
             if (property == null)
             {
                 return NotFound();
             }
 
-            property.PropertyAmenities = property.PropertyAmenities?.Where(pa => pa.Amenity != null).ToList();
-            var propertyDto = new PropertyDetailsDto
-            {
-                Id = property.Id,
-                Title = property.Title,
-                Description = property.Description,
-                Type = property.Type,
-                Status = property.Status,
-                Price = property.Price,
-                Address = property.Address,
-                City = property.City,
-                Country = property.Country,
-                ZipCode = property.ZipCode,
-                Bedrooms = property.Bedrooms,
-                Bathrooms = property.Bathrooms,
-                SquareMeters = property.SquareMeters,
-                CreatedDate = DateTime.Now,
-            };
-
-            return propertyDto;
+            return Ok(property);
         }
 
 
         [HttpGet("{id}/amenities")]
-        public async Task<ActionResult<IEnumerable<Amenity>>> GetPropertyAmenities(int id)
+        public async Task<ActionResult<IEnumerable<AmenityDto>>> GetPropertyAmenities(int id)
         {
             var property = await _context.Properties.FindAsync(id);
             if (property == null)
             {
                 return NotFound();
             }
-            return await _context.Properties
+
+            var amenities = await _context.Properties
                 .Where(p => p.Id == id)
                 .Include(p => p.PropertyAmenities)
-                .SelectMany(p => p.PropertyAmenities.Select(pa => pa.Amenity))
+                .SelectMany(p => p.PropertyAmenities.Select(pa => new AmenityDto
+                {
+                    Id = pa.Amenity.Id,
+                    Name = pa.Amenity.Name
+                }))
                 .ToListAsync();
+
+            return Ok(amenities);
         }
 
 
@@ -153,7 +161,7 @@ namespace RealEstateListingPlatform.Controllers
 
         //[Authorize(Roles = "Admin")]
         [HttpPost("AddAmenityToProperty")]
-        public async Task<ActionResult<PropertyDetailsDto>> AddAmenityToProperty(int propertyId, int amenityId)
+        public async Task<ActionResult<PropertyAmenityDto>> AddAmenityToProperty(int propertyId, int amenityId)
         {
             var property = await _context.Properties.FindAsync(propertyId);
             if (property == null)
@@ -172,26 +180,16 @@ namespace RealEstateListingPlatform.Controllers
             property.PropertyAmenities.Add(new PropertyAmenity { PropertyId = propertyId, AmenityId = amenityId });
             await _context.SaveChangesAsync();
 
+            var propertyName = property.Title; 
+            var amenityName = amenity.Name;
 
-            var updatedPropertyDto = new PropertyDetailsDto
+            var propertyAmenityDto = new PropertyAmenityDto
             {
-                Id = property.Id,
-                Title = property.Title,
-                Description = property.Description,
-                Type = property.Type,
-                Status = property.Status,
-                Price = property.Price,
-                Address = property.Address,
-                City = property.City,
-                Country = property.Country,
-                ZipCode = property.ZipCode,
-                Bedrooms = property.Bedrooms,
-                Bathrooms = property.Bathrooms,
-                SquareMeters = property.SquareMeters,
-                CreatedDate = property.CreatedDate,
+                PropertyName = propertyName,
+                AmenityName = amenityName
             };
 
-            return updatedPropertyDto;
+            return propertyAmenityDto;
         }
 
         //[Authorize(Roles = "Admin")]
@@ -258,11 +256,11 @@ namespace RealEstateListingPlatform.Controllers
             return NoContent();
         }
 
-     
+
 
         //[Authorize(Roles = "Admin")]
         [HttpDelete("RemoveAmenityFromProperty")]
-        public async Task<ActionResult<PropertyDetailsDto>> RemoveAmenityFromProperty(int propertyId, int amenityId)
+        public async Task<ActionResult> RemoveAmenityFromProperty(int propertyId, int amenityId)
         {
             var property = await _context.Properties.Include(p => p.PropertyAmenities)
                                                     .FirstOrDefaultAsync(p => p.Id == propertyId);
@@ -278,27 +276,10 @@ namespace RealEstateListingPlatform.Controllers
             _context.PropertyAmenities.Remove(propertyAmenity);
             await _context.SaveChangesAsync();
 
-    
-            var updatedPropertyDto = new PropertyDetailsDto
-            {
-                Id = property.Id,
-                Title = property.Title,
-                Description = property.Description,
-                Type = property.Type,
-                Status = property.Status,
-                Price = property.Price,
-                Address = property.Address,
-                City = property.City,
-                Country = property.Country,
-                ZipCode = property.ZipCode,
-                Bedrooms = property.Bedrooms,
-                Bathrooms = property.Bathrooms,
-                SquareMeters = property.SquareMeters,
-                CreatedDate = property.CreatedDate,
-            };
-
-            return updatedPropertyDto;
+            return NoContent();
         }
+
+
         [HttpGet("GetFiltered")]
         public async Task<IActionResult> GetFilteredProducts([FromQuery] string status)
         {
