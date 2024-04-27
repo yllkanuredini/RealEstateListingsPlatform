@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RealEstateListingPlatform.Data;
+using RealEstateListingPlatform.DTOs;
 using RealEstateListingPlatform.Models;
 using System.Data;
 
@@ -21,22 +20,34 @@ namespace RealEstateListingPlatform.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Amenity>>> GetAmenities()
+        public async Task<ActionResult<IEnumerable<AmenityDto>>> GetAmenities()
         {
             if (_context.Amenities == null)
             {
                 return NotFound();
             }
-            return await _context.Amenities.Include(p => p.PropertyAmenities).ThenInclude(pa => pa.Property).ToListAsync();
+
+            var amenities = await _context.Amenities
+                .Select(a => new AmenityDto
+                {
+                    Id = a.Id,
+                    Name = a.Name
+                })
+                .ToListAsync();
+
+            return Ok(amenities);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Amenity>> GetAmenity(int id)
+        public async Task<ActionResult<AmenityDto>> GetAmenity(int id)
         {
             var amenity = await _context.Amenities
-                .Include(p => p.PropertyAmenities)
-                .ThenInclude(pa => pa.Property)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .Select(a => new AmenityDto
+                {
+                    Id = a.Id,
+                    Name = a.Name
+                })
+                .FirstOrDefaultAsync(a => a.Id == id);
 
             if (amenity == null)
             {
@@ -45,28 +56,48 @@ namespace RealEstateListingPlatform.Controllers
 
             return amenity;
         }
-        [Authorize(Roles = UserRoles.Admin)]
+
+        //[Authorize(Roles = UserRoles.Admin)]
         [HttpPost]
-        public async Task<ActionResult<Amenity>> CreateAmenity(Amenity amenity)
+        public async Task<ActionResult<AmenityDto>> CreateAmenity(AmenityDto amenityDto)
         {
-            //amenity.PropertyAmenities = new List<PropertyAmenity>();
+            var amenity = new Amenity
+            {
+                Id = amenityDto.Id,
+                Name = amenityDto.Name,
+            };
+
             _context.Amenities.Add(amenity);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetAmenity), new { id = amenity.Id }, amenity);
+            var createdAmenityDto = new AmenityDto
+            {
+                Name = amenityDto.Name,
+            };
+
+            return CreatedAtAction(nameof(GetAmenity), new { id = createdAmenityDto }, createdAmenityDto);
         }
 
-
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAmenity(int id, Amenity amenity)
+        public async Task<IActionResult> UpdateAmenity(int id, AmenityDto amenityDto)
         {
-            if (id != amenity.Id)
+            if (id != amenityDto.Id)
             {
                 return BadRequest();
             }
 
+
+            var amenity = await _context.Amenities.FindAsync(id);
+            if (amenity == null)
+            {
+                return NotFound();
+            }
+
+            amenity.Name = amenityDto.Name;
+
             _context.Entry(amenity).State = EntityState.Modified;
+
 
             try
             {
@@ -86,7 +117,7 @@ namespace RealEstateListingPlatform.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAmenity(int id)
         {
