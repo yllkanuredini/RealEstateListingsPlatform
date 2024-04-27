@@ -41,6 +41,7 @@ namespace RealEstateListingPlatform.Controllers
                     City = p.City,
                     Country = p.Country,
                     ZipCode = p.ZipCode,
+                    PropertyImage = p.PropertyImage,
                     Bedrooms = p.Bedrooms,
                     Bathrooms = p.Bathrooms,
                     SquareMeters = p.SquareMeters,
@@ -73,6 +74,7 @@ namespace RealEstateListingPlatform.Controllers
                     City = p.City,
                     Country = p.Country,
                     ZipCode = p.ZipCode,
+                    PropertyImage = p.PropertyImage,
                     Bedrooms = p.Bedrooms,
                     Bathrooms = p.Bathrooms,
                     SquareMeters = p.SquareMeters,
@@ -116,47 +118,59 @@ namespace RealEstateListingPlatform.Controllers
         [HttpPost]
         public async Task<ActionResult<PropertyDetailsDto>> CreateProperty(PropertyDetailsDto propertyDto)
         {
-            var property = new Property
+            try
             {
-                Title = propertyDto.Title,
-                Description = propertyDto.Description,
-                Type = propertyDto.Type,
-                Status = propertyDto.Status,
-                Price = propertyDto.Price,
-                Address = propertyDto.Address,
-                City = propertyDto.City,
-                Country = propertyDto.Country,
-                ZipCode = propertyDto.ZipCode,
-                Bedrooms = propertyDto.Bedrooms,
-                Bathrooms = propertyDto.Bathrooms,
-                SquareMeters = propertyDto.SquareMeters,
-                CreatedDate = DateTime.Now,
-                //dhufbucvb hj
-            };
+                var property = new Property
+                {
+                    Title = propertyDto.Title,
+                    Description = propertyDto.Description,
+                    Type = propertyDto.Type,
+                    Status = propertyDto.Status,
+                    Price = propertyDto.Price,
+                    Address = propertyDto.Address,
+                    City = propertyDto.City,
+                    Country = propertyDto.Country,
+                    ZipCode = propertyDto.ZipCode,
+                    PropertyImage = propertyDto.PropertyImage,
+                    Bedrooms = propertyDto.Bedrooms,
+                    Bathrooms = propertyDto.Bathrooms,
+                    SquareMeters = propertyDto.SquareMeters,
+                    CreatedDate = DateTime.UtcNow,
+                    //dhufbucvb hj
+                };
 
-            _context.Properties.Add(property);
-            await _context.SaveChangesAsync();
+                _context.Properties.Add(property);
+                await _context.SaveChangesAsync();
 
 
-            var createdPropertyDto = new PropertyDetailsDto
+                var createdPropertyDto = new PropertyDetailsDto
+                {
+                    Id = property.Id,
+                    Title = property.Title,
+                    Description = property.Description,
+                    Type = property.Type,
+                    Status = property.Status,
+                    Price = property.Price,
+                    Address = property.Address,
+                    City = property.City,
+                    Country = property.Country,
+                    ZipCode = property.ZipCode,
+                    PropertyImage = property.PropertyImage,
+                    Bedrooms = property.Bedrooms,
+                    Bathrooms = property.Bathrooms,
+                    SquareMeters = property.SquareMeters,
+                    CreatedDate = property.CreatedDate,
+                };
+                return CreatedAtAction(nameof(GetProperty), new { id = createdPropertyDto.Id }, createdPropertyDto);
+
+            }
+            catch (Exception ex)
             {
-                Id = property.Id,
-                Title = property.Title,
-                Description = property.Description,
-                Type = property.Type,
-                Status = property.Status,
-                Price = property.Price,
-                Address = property.Address,
-                City = property.City,
-                Country = property.Country,
-                ZipCode = property.ZipCode,
-                Bedrooms = property.Bedrooms,
-                Bathrooms = property.Bathrooms,
-                SquareMeters = property.SquareMeters,
-                CreatedDate = property.CreatedDate,
-            };
 
-            return CreatedAtAction(nameof(GetProperty), new { id = createdPropertyDto.Id }, createdPropertyDto);
+                throw;
+            }
+
+            return Ok();
         }
 
 
@@ -217,6 +231,7 @@ namespace RealEstateListingPlatform.Controllers
             property.City = propertyDto.City;
             property.Country = propertyDto.Country;
             property.ZipCode = propertyDto.ZipCode;
+            property.PropertyImage = propertyDto.PropertyImage;
             property.Bedrooms = propertyDto.Bedrooms;
             property.Bathrooms = propertyDto.Bathrooms;
             property.SquareMeters = propertyDto.SquareMeters;

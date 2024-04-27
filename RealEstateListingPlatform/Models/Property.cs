@@ -15,6 +15,7 @@ namespace RealEstateListingPlatform.Models
         public string City { get; set; }
         public string Country { get; set; }
         public string ZipCode { get; set; }
+        public string PropertyImage { get; set; }
         public int Bedrooms { get; set; }
         public int Bathrooms { get; set; }
         public int SquareMeters { get; set; }
