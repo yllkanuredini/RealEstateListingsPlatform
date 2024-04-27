@@ -131,6 +131,7 @@ namespace RealEstateListingPlatform.Controllers
                 Bathrooms = propertyDto.Bathrooms,
                 SquareMeters = propertyDto.SquareMeters,
                 CreatedDate = DateTime.Now,
+                //dhufbucvb hj
             };
 
             _context.Properties.Add(property);
