@@ -24,10 +24,11 @@ namespace RealEstateListingPlatform.Controllers
                 .Where(p => p.Status.ToLower() == "for sale")
                 .ToList();
 
-            /* if (!propertiesForSale.Any())
+            if (!propertiesForSale.Any())
              {
-                 return NotFound("No properties for sale found.");
-             }*/
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
+             }
 
             return Ok(propertiesForSale);
         }
@@ -40,10 +41,11 @@ namespace RealEstateListingPlatform.Controllers
                 .Where(p => p.Status.ToLower() == "for rent")
                 .ToList();
 
-            /*if (!propertiesForRent.Any())
+            if (!propertiesForRent.Any())
             {
-                return NotFound("No properties for rent found.");
-            }*/
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
+            }
 
             return Ok(propertiesForRent);
         }

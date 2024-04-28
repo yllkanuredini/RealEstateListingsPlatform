@@ -26,7 +26,8 @@ namespace RealEstateListingPlatform.Controllers
         {
             if (_context.Properties == null)
             {
-                return NotFound();
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
             var properties = await _context.Properties
                 .Select(p => new PropertyDetailsDto
@@ -57,7 +58,8 @@ namespace RealEstateListingPlatform.Controllers
         {
             if (_context.Properties == null)
             {
-                return NotFound();
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
 
             var property = await _context.Properties
@@ -84,7 +86,8 @@ namespace RealEstateListingPlatform.Controllers
 
             if (property == null)
             {
-                return NotFound();
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
 
             return Ok(property);
@@ -97,7 +100,8 @@ namespace RealEstateListingPlatform.Controllers
             var property = await _context.Properties.FindAsync(id);
             if (property == null)
             {
-                return NotFound();
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
 
             var amenities = await _context.Properties
@@ -181,12 +185,14 @@ namespace RealEstateListingPlatform.Controllers
             var property = await _context.Properties.FindAsync(propertyId);
             if (property == null)
             {
-                return NotFound("Property not found.");
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
             var amenity = await _context.Amenities.FindAsync(amenityId);
             if (amenity == null)
             {
-                return NotFound("Amenity not found.");
+                var error = new { error = "No amenity found matching the search criteria" };
+                return NotFound(error);
             }
             if (property.PropertyAmenities == null)
             {
@@ -219,7 +225,8 @@ namespace RealEstateListingPlatform.Controllers
             var property = await _context.Properties.FindAsync(id);
             if (property == null)
             {
-                return NotFound();
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
 
             property.Title = propertyDto.Title;
@@ -246,7 +253,8 @@ namespace RealEstateListingPlatform.Controllers
             {
                 if (!PropertyExists(id))
                 {
-                    return NotFound();
+                    var error = new { error = "No properties found matching the search criteria" };
+                    return NotFound(error);
                 }
                 else
                 {
@@ -282,12 +290,14 @@ namespace RealEstateListingPlatform.Controllers
                                                     .FirstOrDefaultAsync(p => p.Id == propertyId);
             if (property == null)
             {
-                return NotFound("Property not found.");
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
             var propertyAmenity = property.PropertyAmenities.FirstOrDefault(pa => pa.AmenityId == amenityId);
             if (propertyAmenity == null)
             {
-                return NotFound("Amenity not found for this property.");
+                var error = new { error = "No amenity for this property was found" };
+                return NotFound(error);
             }
             _context.PropertyAmenities.Remove(propertyAmenity);
             await _context.SaveChangesAsync();
@@ -305,10 +315,11 @@ namespace RealEstateListingPlatform.Controllers
                 var properties = await _context.Properties.Include(p => p.PropertyAmenities).
              Where(p => status.Equals("ALL") || p.Status == status).ToListAsync();
 
-                //if(!properties.Any())
-                //{
-                //    return NotFound();
-                //}
+                if(!properties.Any())
+                {
+                    var error = new { error = "No properties found matching the search criteria" };
+                    return NotFound(error);
+                }
                 return Ok(properties);
 
             }

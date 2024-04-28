@@ -24,7 +24,8 @@ namespace RealEstateListingPlatform.Controllers
         {
             if (_context.Amenities == null)
             {
-                return NotFound();
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
 
             var amenities = await _context.Amenities
@@ -51,7 +52,8 @@ namespace RealEstateListingPlatform.Controllers
 
             if (amenity == null)
             {
-                return NotFound();
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
 
             return amenity;
@@ -91,7 +93,8 @@ namespace RealEstateListingPlatform.Controllers
             var amenity = await _context.Amenities.FindAsync(id);
             if (amenity == null)
             {
-                return NotFound();
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
 
             amenity.Name = amenityDto.Name;
@@ -124,7 +127,8 @@ namespace RealEstateListingPlatform.Controllers
             var amenity = await _context.Amenities.FindAsync(id);
             if (amenity == null)
             {
-                return NotFound();
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
 
             _context.Amenities.Remove(amenity);

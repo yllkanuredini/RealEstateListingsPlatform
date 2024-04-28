@@ -71,7 +71,8 @@ public class ContactController : ControllerBase
 
         if (inquiry == null)
         {
-            return NotFound();
+            var error = new { error = "No properties found matching the search criteria" };
+            return NotFound(error);
         }
 
         var inquiryDetailDto = new InquiryDetailDTO
@@ -94,7 +95,8 @@ public class ContactController : ControllerBase
 
         if (inquiry == null)
         {
-            return NotFound();
+            var error = new { error = "No properties found matching the search criteria" };
+            return NotFound(error);
         }
 
         _context.Inquiries.Remove(inquiry);
@@ -156,7 +158,8 @@ public class ContactController : ControllerBase
 
         if (viewing == null)
         {
-            return NotFound();
+            var error = new { error = "No properties found matching the search criteria" };
+            return NotFound(error);
         }
 
         var viewingDetailDto = new ViewingDetailDTO
@@ -179,7 +182,8 @@ public class ContactController : ControllerBase
 
         if (viewing == null)
         {
-            return NotFound();
+            var error = new { error = "No properties found matching the search criteria" };
+            return NotFound(error);
         }
 
         viewing.PropertyId = viewingDto.PropertyId;
@@ -200,7 +204,8 @@ public class ContactController : ControllerBase
 
         if (viewing == null)
         {
-            return NotFound();
+            var error = new { error = "No properties found matching the search criteria" };
+            return NotFound(error);
         }
 
         _context.Viewings.Remove(viewing);
