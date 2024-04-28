@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Validations;
 using RealEstateListingPlatform.Data;
 using RealEstateListingPlatform.Models;
 
@@ -24,11 +26,11 @@ namespace RealEstateListingPlatform.Controllers
         // General search endpoint
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Property>>> SearchProperties(
-            string type,
+            string? type,
             decimal? minPrice,
             decimal? maxPrice,
-            string location,
-            string amenities)
+            string? location,
+            string? amenities)
         {
             var query = _context.Properties.AsQueryable();
 
@@ -64,7 +66,8 @@ namespace RealEstateListingPlatform.Controllers
 
             if (!properties.Any())
             {
-                return NotFound("No properties found matching the search criteria.");
+                var error = new {error = "No properties found matching the search criteria."};
+                return NotFound(error);
             }
 
             return Ok(properties);
@@ -79,7 +82,10 @@ namespace RealEstateListingPlatform.Controllers
                 .ToListAsync();
 
             if (!properties.Any())
-                return NotFound("No properties found of the specified type.");
+            {
+                var error = new { error = "No properties found matching the search criteria." };
+                return NotFound(error);
+            }
 
             return Ok(properties);
         }
@@ -93,7 +99,10 @@ namespace RealEstateListingPlatform.Controllers
                 .ToListAsync();
 
             if (!properties.Any())
-                return NotFound("No properties found within the specified price range.");
+            {
+                var error = new { error = "No properties found within the specified price range." };
+                return NotFound(error);
+            }
 
             return Ok(properties);
         }
@@ -109,7 +118,10 @@ namespace RealEstateListingPlatform.Controllers
                 .ToListAsync();
 
             if (!properties.Any())
-                return NotFound("No properties found in the specified location.");
+            {
+                var error = new { error = "No properties found in the specified location." };
+                return NotFound(error);
+            }
 
             return Ok(properties);
         }
@@ -124,7 +136,10 @@ namespace RealEstateListingPlatform.Controllers
                 .ToListAsync();
 
             if (!properties.Any())
-                return NotFound("No properties found with the specified amenities.");
+            {
+                var error = new { error = "No properties found with the specified amenities." };
+                return NotFound(error);
+            }
 
             return Ok(properties);
         }

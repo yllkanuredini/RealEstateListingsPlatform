@@ -19,7 +19,7 @@ namespace RealEstateListingPlatform.Controllers
         {
             _context = context;
         }
-
+        
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PropertyDetailsDto>>> GetProperties()
@@ -305,10 +305,10 @@ namespace RealEstateListingPlatform.Controllers
                 var properties = await _context.Properties.Include(p => p.PropertyAmenities).
              Where(p => status.Equals("ALL") || p.Status == status).ToListAsync();
 
-                if(!properties.Any())
-                {
-                    return NotFound();
-                }
+                //if(!properties.Any())
+                //{
+                //    return NotFound();
+                //}
                 return Ok(properties);
 
             }
