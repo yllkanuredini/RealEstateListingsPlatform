@@ -39,7 +39,8 @@ namespace RealEstateListingPlatform.Controllers
 
             if (propertyImage == null)
             {
-                return NotFound();
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
 
             return propertyImage;
@@ -52,7 +53,8 @@ namespace RealEstateListingPlatform.Controllers
             var property = await _context.Properties.FindAsync(propertyId);
             if (property == null)
             {
-                return NotFound("Property not found.");
+                var error = new { error = "No properties found matching the search criteria" };
+                return NotFound(error);
             }
 
             var propertyImage = new PropertyImage
@@ -87,7 +89,8 @@ namespace RealEstateListingPlatform.Controllers
             {
                 if (!PropertyImageExists(id))
                 {
-                    return NotFound();
+                    var error = new { error = "No property image found matching the search criteria" };
+                    return NotFound(error);
                 }
                 else
                 {
@@ -106,7 +109,8 @@ namespace RealEstateListingPlatform.Controllers
 
             if (propertyImage == null)
             {
-                return NotFound();
+                var error = new { error = "No property image found matching the search criteria" };
+                return NotFound(error);
             }
 
             _context.PropertyImages.Remove(propertyImage);
