@@ -71,7 +71,7 @@ public class ContactController : ControllerBase
 
         if (inquiry == null)
         {
-            var error = new { error = "No properties found matching the search criteria" };
+            var error = new { error = "No inquiries found" };
             return NotFound(error);
         }
 
@@ -95,7 +95,7 @@ public class ContactController : ControllerBase
 
         if (inquiry == null)
         {
-            var error = new { error = "No properties found matching the search criteria" };
+            var error = new { error = "No inquiries found" };
             return NotFound(error);
         }
 
@@ -158,7 +158,7 @@ public class ContactController : ControllerBase
 
         if (viewing == null)
         {
-            var error = new { error = "No properties found matching the search criteria" };
+            var error = new { error = "Not found" };
             return NotFound(error);
         }
 
@@ -182,7 +182,7 @@ public class ContactController : ControllerBase
 
         if (viewing == null)
         {
-            var error = new { error = "No properties found matching the search criteria" };
+            var error = new { error = "Not found" };
             return NotFound(error);
         }
 
@@ -204,7 +204,7 @@ public class ContactController : ControllerBase
 
         if (viewing == null)
         {
-            var error = new { error = "No properties found matching the search criteria" };
+            var error = new { error = "Not found" };
             return NotFound(error);
         }
 
